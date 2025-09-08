@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Belated HBD 😝💗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            text-align: center;
+            background: radial-gradient(circle at center);
+            background-image: url(bg.png);
+        }
+        h1, h2 {
+            font-family: 'Pacifico', cursive;
+        }
+        .page-container {
+            display: none;
+        }
+        .page-container.active {
+            display: block;
+        }
+        #no-btn {
+            position: relative;
+            transition: transform 0.4s ease-in-out;
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-6">
+
+    <canvas id="heart-canvas" class="fixed top-0 left-0 w-screen h-screen pointer-events-none z-0"></canvas>
+
+    <button id="music-toggle" onclick="toggleMusic()" class="fixed top-5 right-5 z-20 text-xs px-4 py-2 bg-rose-200 text-gray-800 rounded-xl cursor-pointer select-none transition-transform hover:scale-105">🔈 Toggle Music</button>
+
+    <div id="container" class="relative z-10 max-w-2xl w-full max-h-[90vh] bg-white bg-opacity-85 rounded-3xl shadow-2xl p-8 md:p-12 overflow-y-auto">
+
+        <div id="page1" class="page-container active">
+            <h1 class="text-4xl md:text-5xl text-rose-600 mb-4 animate-pulse">Guess who's late 😝</h1>
+            <p class="text-lg text-gray-700 mb-4">I know your birthday passed...And I've planned this gift long time ago.</p>
+            <p class="text-lg text-gray-700 mb-6">It would be a waste letting it go (˵ •̀ ᴗ - ˵ ) ✧</p>
+            <button onclick="goToPage('page2')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">Okay... what is it?</button>
+        </div>
+
+        <div id="page2" class="page-container">
+            <p id="typing" class="min-h-[6rem] text-2xl md:text-3xl font-bold text-gray-800 border-r-2 border-rose-600 whitespace-nowrap overflow-hidden w-fit mx-auto my-4 animate-[blink_0.7s_infinite_step-end]"></p>
+            <button id="next-btn" onclick="nextMessage()" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">Next</button>
+        </div>
+
+        <div id="page3" class="page-container">
+            <h2 class="text-3xl text-rose-500 mb-6">Click a letter 💌</h2>
+            <div class="space-y-4">
+                <div class="letter bg-rose-50 p-4 rounded-2xl shadow-md cursor-pointer transition-transform hover:scale-105 hover:shadow-lg" onclick="showReason(0)">💌 Reason 1</div>
+                <div class="letter bg-rose-50 p-4 rounded-2xl shadow-md cursor-pointer transition-transform hover:scale-105 hover:shadow-lg" onclick="showReason(1)">💌 Reason 2</div>
+                <div class="letter bg-rose-50 p-4 rounded-2xl shadow-md cursor-pointer transition-transform hover:scale-105 hover:shadow-lg" onclick="showReason(2)">💌 Reason 3</div>
+            </div>
+            <p id="reason-text" class="mt-8 text-lg text-gray-700 italic"></p>
+            <button onclick="goToPage('page4')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">Next</button>
+        </div>
+
+        <div id="page4" class="page-container">
+            <h2 class="text-3xl text-rose-500 mb-6">🎁 Here's your late but lovely gift hihi</h2>
+            <button id="gift-btn" onclick="showGift()" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 animate-[wiggle_2s_infinite]">Open the box 🎁</button>
+            <p id="gift-text" class="hidden mt-8 text-2xl md:text-3xl font-bold text-rose-600">It's me (๑> ؂•̀๑) Always yours ( ˶˘ ³˘)♡</p>
+            <button onclick="goToPage('page5')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-8">Next</button>
+        </div>
+
+        <div id="page5" class="page-container">
+            <p class="text-lg text-gray-700 mb-6">Do you promise to love me even if I'm late sometimes? 🥺</p>
+            <div class="flex justify-center items-center space-x-6">
+                <button onclick="showMessage('Yay! Promise accepted. You are the best! ❤️', 'page6')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">Yes</button>
+                <button id="no-btn" onmouseover="runAway(this)" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-full shadow-lg relative">No</button>
+            </div>
+            <div id="message-box" class="fixed inset-0 flex items-center justify-center p-4 z-50 pointer-events-none hidden">
+                <div class="bg-rose-100 text-rose-800 p-6 rounded-2xl shadow-lg transition-opacity duration-300 opacity-0 transform-gpu translate-y-4 text-center">
+                    <p id="message-text" class="text-lg"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page6" class="page-container">
+            <button onmousedown="startHold()" onmouseup="stopHold()" onmouseleave="stopHold()" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">Hold me 💞</button>
+            <p id="final-msg" class="text-3xl md:text-4xl font-bold text-rose-600 mt-8 opacity-0 transition-opacity duration-500">We may always fight...  but I'll never stop loving you dummy <br> (¬_ ´¬ )♡</p>
+            <button onclick="goToPage('bonusIntro')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-8">🎁 Bonus Doctor Mode</button>
+        </div>
+
+        <div id="bonusIntro" class="page-container">
+            <h2 class="text-3xl text-rose-500 mb-4">Doctor Mode Activated 👨‍⚕️</h2>
+            <p class="text-lg text-gray-700 mb-6">You're a genius my doctor-to-be, cant let this slide without some fun games 😉</p>
+            <button onclick="goToPage('bonus1')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">Start the Bonus Games</button>
+            <button onclick="goToPage('page6')" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-4">Back to Love</button>
+        </div>
+
+        <div id="bonus1" class="page-container">
+            <div class="bg-rose-50 p-6 rounded-2xl shadow-lg">
+                <h3 class="text-2xl text-rose-800 mb-4">Diagnose Me, Doc 🩺</h3>
+                <p class="text-lg text-gray-700 mb-4">Symptoms: Fast heartbeat, daydreaming, butterflies in stomach. Diagnosis? <br> ehem ehemm </p>
+                <div class="space-x-2">
+                    <button onclick="diagnose('flu')" class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full transition-colors">Common Cold</button>
+                    <button onclick="diagnose('love')" class="bg-rose-500 text-white font-bold py-2 px-4 rounded-full transition-colors">Severe Love Overdose 💘</button>
+                    <button onclick="diagnose('stress')" class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full transition-colors">Academic Stress</button>
+                </div>
+                <p id="diagnose-result" class="mt-4 text-lg font-semibold"></p>
+                <button onclick="goToPage('bonus2')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-6">Next</button>
+            </div>
+        </div>
+
+        <div id="bonus2" class="page-container">
+            <div class="bg-rose-50 p-6 rounded-2xl shadow-lg">
+                <h3 class="text-2xl text-rose-800 mb-4">Prescribe Your Love 💊</h3>
+                <textarea id="prescription-text" rows="3" class="w-full p-3 rounded-xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-500 mb-4" placeholder="Write your prescription here, doctor..."></textarea>
+                <button onclick="validatePrescription()" class="bg-rose-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all transform hover:scale-105">Validate Prescription</button>
+                <p id="prescription-result" class="mt-4 text-lg font-semibold"></p>
+                <button onclick="goToPage('bonus3')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-6">Next</button>
+            </div>
+        </div>
+
+        <div id="bonus3" class="page-container">
+            <div class="bg-rose-50 p-6 rounded-2xl shadow-lg">
+                <h3 class="text-2xl text-rose-800 mb-4">Brain Scan 🧠</h3>
+                <p class="text-lg text-gray-700 mb-4">Tap the brain area you think is most active right now:</p>
+                <div class="flex justify-center space-x-4">
+                    <div role="button" tabindex="0" class="w-20 h-20 rounded-full text-white text-lg flex flex-col items-center justify-center cursor-pointer select-none shadow-md transition-transform hover:scale-110 bg-[#f28ab2]" onclick="brainClick('wrong')">
+                        🧠<br /><small>Frontal</small>
+                    </div>
+                    <div role="button" tabindex="0" class="w-20 h-20 rounded-full text-white text-lg flex flex-col items-center justify-center cursor-pointer select-none shadow-md transition-transform hover:scale-110 bg-[#f2a65a]" onclick="brainClick('wrong')">
+                        🧠<br /><small>Temporal</small>
+                    </div>
+                    <div role="button" tabindex="0" class="w-20 h-20 rounded-full text-white text-lg flex flex-col items-center justify-center cursor-pointer select-none shadow-md transition-transform hover:scale-110 bg-[#8ab2f2]" onclick="brainClick('right')">
+                        🧠<br /><small>Parietal</small>
+                    </div>
+                    <div role="button" tabindex="0" class="w-20 h-20 rounded-full text-white text-lg flex flex-col items-center justify-center cursor-pointer select-none shadow-md transition-transform hover:scale-110 bg-[#a5f28a]" onclick="brainClick('wrong')">
+                        🧠<br /><small>Occipital</small>
+                    </div>
+                </div>
+                <p id="brain-result" class="mt-4 text-lg font-semibold"></p>
+                <button onclick="goToPage('bonus5')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-6">Next</button>
+            </div>
+        </div>
+        
+        <div id="bonus5" class="page-container">
+            <div class="bg-rose-50 p-6 rounded-2xl shadow-lg">
+                <h3 class="text-2xl text-rose-800 mb-4">The Mirror 🪞</h3>
+                <p class="text-lg text-gray-700 mb-4">When you look into the mirror of my soul, what do you see?</p>
+                <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div tabindex="0" role="button" class="bg-rose-200 p-4 rounded-2xl cursor-pointer shadow-md transition-transform hover:scale-105 font-semibold text-lg" onclick="chooseMirror('reflection1')">Warmth and kindness</div>
+                    <div tabindex="0" role="button" class="bg-rose-200 p-4 rounded-2xl cursor-pointer shadow-md transition-transform hover:scale-105 font-semibold text-lg" onclick="chooseMirror('reflection2')">Depth and mystery</div>
+                    <div tabindex="0" role="button" class="bg-rose-200 p-4 rounded-2xl cursor-pointer shadow-md transition-transform hover:scale-105 font-semibold text-lg" onclick="chooseMirror('reflection3')">Joy and lightness</div>
+                </div>
+                <p id="mirror-result" class="mt-4 text-lg font-semibold italic"></p>
+                <button onclick="goToPage('page1')" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105 mt-6">Back to the start!</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* === PAGE MANAGEMENT === */
+        const pages = ['page1','page2','page3','page4','page5','page6', 'bonusIntro', 'bonus1', 'bonus2', 'bonus3', 'bonus5'];
+        let currentPageId = 'page1';
+        let historyStack = [];
+
+        function showPage(id) {
+            pages.forEach(p => {
+                const pageEl = document.getElementById(p);
+                if (pageEl) {
+                    pageEl.classList.remove('active');
+                }
+            });
+            const pageEl = document.getElementById(id);
+            if (pageEl) {
+                pageEl.classList.add('active');
+            }
+        }
+
+        function goToPage(pageId) {
+            if (pageId !== currentPageId) {
+                historyStack.push(currentPageId);
+            }
+            currentPageId = pageId;
+            showPage(currentPageId);
+        }
+
+        // Initialize page on load
+        window.onload = () => {
+            showPage('page1');
+            initFloatingHearts();
+        };
+        
+        /* === TYPING EFFECT (PAGE 2) === */
+        const messages = [
+            "Dear Yassou, although this is late,",
+            "Every word comes straight from my heart.",
+            "Thank you for being You ૮꒰⸝⸝> ̫ <⸝⸝꒱ა ",
+            "I hope this little surprise makes you smile."
+        ];
+        let messageIndex = 0;
+        let charIndex = 0;
+        let typedText = '';
+
+        function typeMessage(msg) {
+            if (charIndex < msg.length) {
+                typedText += msg.charAt(charIndex);
+                document.getElementById('typing').textContent = typedText;
+                charIndex++;
+                setTimeout(() => typeMessage(msg), 50);
+            } else {
+                document.getElementById('next-btn').disabled = false;
+            }
+        }
+
+        function nextMessage() {
+            messageIndex++;
+            if (messageIndex < messages.length) {
+                typedText = '';
+                charIndex = 0;
+                document.getElementById('typing').textContent = '';
+                document.getElementById('next-btn').disabled = true;
+                typeMessage(messages[messageIndex]);
+            } else {
+                goToPage('page3');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new MutationObserver(() => {
+                if(document.getElementById('page2').classList.contains('active')) {
+                    messageIndex = 0;
+                    typedText = '';
+                    charIndex = 0;
+                    document.getElementById('typing').textContent = '';
+                    document.getElementById('next-btn').disabled = true;
+                    typeMessage(messages[0]);
+                }
+            });
+            const page2El = document.getElementById('page2');
+            if (page2El) {
+                observer.observe(page2El, { attributes: true, attributeFilter: ['class'] });
+            }
+        });
+
+        /* === LETTERS PAGE (PAGE 3) === */
+        const reasons = [
+            "Because your smile brightens even my darkest days (⸝⸝⸝>﹏<⸝⸝⸝)",
+            "Because your kindness teaches me how to love better 🥰",
+            "Because you make me feel like I deserve to be loved 👉👈"
+        ];
+        function showReason(idx) {
+            document.getElementById('reason-text').textContent = reasons[idx];
+        }
+
+        /* === GIFT PAGE (PAGE 4) === */
+        function showGift() {
+            document.getElementById('gift-text').classList.remove('hidden');
+            document.getElementById('gift-btn').disabled = true;
+        }
+
+        /* === PROMISE PAGE (PAGE 5) === */
+        function runAway(el) {
+            const maxX = 250;
+            const maxY = 150;
+            const randomX = Math.floor(Math.random() * maxX) - maxX/2;
+            const randomY = Math.floor(Math.random() * maxY) - maxY/2;
+            const randomRotate = Math.floor(Math.random() * 360) - 180;
+            el.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRotate}deg)`;
+        }
+
+        function showMessage(msg, nextPageId) {
+            const msgBox = document.getElementById('message-box');
+            const msgText = document.getElementById('message-text');
+            msgText.textContent = msg;
+            msgBox.classList.remove('hidden');
+            setTimeout(() => {
+                msgBox.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => {
+                    msgBox.classList.add('hidden');
+                    msgBox.classList.remove('opacity-0', 'translate-y-4');
+                    goToPage(nextPageId);
+                }, 500);
+            }, 2000);
+            setTimeout(() => {
+                msgBox.querySelector('div').classList.remove('opacity-0', 'translate-y-4');
+            }, 10);
+        }
+
+        /* === FINAL HOLD MESSAGE PAGE (PAGE 6) === */
+        let holdTimeout;
+        function startHold() {
+            holdTimeout = setTimeout(() => {
+                document.getElementById('final-msg').style.opacity = 1;
+            }, 1500);
+        }
+        function stopHold() {
+            clearTimeout(holdTimeout);
+            document.getElementById('final-msg').style.opacity = 0;
+        }
+
+        /* === BONUS MODE GAMES === */
+        let prescriptionAttempts = 0;
+
+        function diagnose(answer) {
+            const result = document.getElementById('diagnose-result');
+            if (answer === 'love') {
+                result.textContent = "Correct! Love Overdose detected 💘. Immediate hugs and kisses prescribed.";
+                result.style.color = '#d14972';
+            } else {
+                result.textContent = "Hmm, not quite... Try again, genius doctor!";
+                result.style.color = 'gray';
+            }
+        }
+
+        function validatePrescription() {
+            const presc = document.getElementById('prescription-text').value.trim().toLowerCase();
+            const result = document.getElementById('prescription-result');
+            if (presc.includes('yassoura')) {
+                result.textContent = "Your prescription is accepted. You’re a caring doctor indeed! ❤️";
+                result.style.color = '#d14972';
+                prescriptionAttempts = 0;
+            } else {
+                prescriptionAttempts++;
+                result.style.color = 'gray';
+                if (prescriptionAttempts <= 3) {
+                    result.textContent = "That's not the right prescription for my heart. Think carefully, doc!";
+                } else {
+                    result.textContent = "Think SumOne hihi";
+                }
+            }
+        }
+
+        function brainClick(result) {
+            const resEl = document.getElementById('brain-result');
+            if (result === 'right') {
+                resEl.textContent = "The parietal lobe is not a primary center for love, but it plays an important supporting role. Its main job is to integrate sensory information from the body and the environment. This function is critical for how we experience and interact with a loved one 💞.";
+                resEl.style.color = '#d14972';
+            } else {
+                resEl.textContent = "Not quite! Try to think about where love really <acts> in the brain.";
+                resEl.style.color = 'gray';
+            }
+        }
+        
+        function chooseMirror(choice) {
+            const texts = {
+                reflection1: "Your reflection sees warmth — the steady flame of love that never fades.",
+                reflection2: "Your reflection sees mystery — depths yet to be explored, like our journey.",
+                reflection3: "Your reflection sees joy — the lightness that dances in every smile we share."
+            };
+            const el = document.getElementById('mirror-result');
+            el.textContent = texts[choice];
+            el.style.color = '#d14972';
+        }
+
+        /* === FLOATING HEARTS EFFECT === */
+        function initFloatingHearts() {
+            const canvas = document.getElementById('heart-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let hearts = [];
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function Heart() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = 15 + Math.random() * 10;
+                this.speedY = 0.5 + Math.random() * 1;
+                this.opacity = 0.1 + Math.random() * 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speedAngle = 0.02 + Math.random() * 0.03;
+            }
+
+            Heart.prototype.update = function() {
+                this.y -= this.speedY;
+                this.angle += this.speedAngle;
+                if(this.y < -this.size) {
+                    this.y = height + this.size;
+                    this.x = Math.random() * width;
+                }
+            };
+
+            Heart.prototype.draw = function() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#d14972';
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size/4);
+                ctx.bezierCurveTo(this.size/2, -this.size*3/4, this.size*1.2, -this.size/4, 0, this.size);
+                ctx.bezierCurveTo(-this.size*1.2, -this.size/4, -this.size/2, -this.size*3/4, 0, -this.size/4);
+                ctx.fill();
+                ctx.restore();
+            };
+
+            for(let i=0; i<30; i++) {
+                hearts.push(new Heart());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                hearts.forEach(h => {
+                    h.update();
+                    h.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        /* === MUSIC TOGGLE === */
+        let musicOn = false;
+        let audio = new Audio('Hollow_Knight_Silksong_SHERMA_SONG.mp3');
+        audio.loop = true;
+        audio.volume = 0.15;
+
+        function toggleMusic() {
+            if(musicOn) {
+                audio.pause();
+                musicOn = false;
+                document.getElementById('music-toggle').textContent = '🔈 Toggle Music';
+            } else {
+                audio.play();
+                musicOn = true;
+                document.getElementById('music-toggle').textContent = '🔊 Music On';
+            }
+        }
+    </script>
+
+</body>
+</html>
